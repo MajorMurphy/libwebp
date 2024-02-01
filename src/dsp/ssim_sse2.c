@@ -11,14 +11,14 @@
 //
 // Author: Skal (pascal.massimino@gmail.com)
 
-#include "src/dsp/dsp.h"
+#include "../dsp/dsp.h"
 
 #if defined(WEBP_USE_SSE2)
 
 #include <assert.h>
 #include <emmintrin.h>
 
-#include "src/dsp/common_sse2.h"
+#include "../dsp/common_sse2.h"
 
 #if !defined(WEBP_DISABLE_STATS)
 
@@ -98,7 +98,7 @@ static uint32_t HorizontalAdd32b_SSE2(const __m128i* const m) {
   return (uint32_t)_mm_cvtsi128_si32(c);
 }
 
-static const uint16_t kWeight[] = { 1, 2, 3, 4, 3, 2, 1, 0 };
+static const uint16_t kWeight_SSIM_SSE2[] = { 1, 2, 3, 4, 3, 2, 1, 0 };
 
 #define ACCUMULATE_ROW(WEIGHT) do {                         \
   /* compute row weight (Wx * Wy) */                        \
@@ -128,7 +128,7 @@ static double SSIMGet_SSE2(const uint8_t* src1, int stride1,
   const __m128i zero = _mm_setzero_si128();
   __m128i xm = zero, ym = zero;                // 16b accums
   __m128i xxm = zero, yym = zero, xym = zero;  // 32b accum
-  const __m128i Wx = _mm_loadu_si128((const __m128i*)kWeight);
+  const __m128i Wx = _mm_loadu_si128((const __m128i*)kWeight_SSIM_SSE2);
   assert(2 * VP8_SSIM_KERNEL + 1 == 7);
   ACCUMULATE_ROW(1);
   ACCUMULATE_ROW(2);

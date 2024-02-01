@@ -13,16 +13,16 @@
 //          Jyrki Alakuijala (jyrki@google.com)
 //          Urvang Joshi (urvang@google.com)
 
-#include "src/dsp/dsp.h"
+#include "../dsp/dsp.h"
 
 #include <assert.h>
 #include <math.h>
 #include <stdlib.h>
-#include "src/dec/vp8li_dec.h"
-#include "src/utils/endian_inl_utils.h"
-#include "src/dsp/lossless.h"
-#include "src/dsp/lossless_common.h"
-#include "src/dsp/yuv.h"
+#include "../dec/vp8li_dec.h"
+#include "../utils/endian_inl_utils.h"
+#include "../dsp/lossless.h"
+#include "../dsp/lossless_common.h"
+#include "../dsp/yuv.h"
 
 // lookup table for small values of log2(int)
 const float kLog2Table[LOG_LOOKUP_IDX_MAX] = {
@@ -530,7 +530,7 @@ void VP8LSubtractGreenFromBlueAndRed_C(uint32_t* argb_data, int num_pixels) {
   }
 }
 
-static WEBP_INLINE int ColorTransformDelta(int8_t color_pred, int8_t color) {
+static WEBP_INLINE int ColorTransformDelta_LOSSLESS_ENC(int8_t color_pred, int8_t color) {
   return ((int)color_pred * color) >> 5;
 }
 
@@ -547,10 +547,10 @@ void VP8LTransformColor_C(const VP8LMultipliers* const m, uint32_t* data,
     const int8_t red   = U32ToS8(argb >> 16);
     int new_red = red & 0xff;
     int new_blue = argb & 0xff;
-    new_red -= ColorTransformDelta((int8_t)m->green_to_red_, green);
+    new_red -= ColorTransformDelta_LOSSLESS_ENC((int8_t)m->green_to_red_, green);
     new_red &= 0xff;
-    new_blue -= ColorTransformDelta((int8_t)m->green_to_blue_, green);
-    new_blue -= ColorTransformDelta((int8_t)m->red_to_blue_, red);
+    new_blue -= ColorTransformDelta_LOSSLESS_ENC((int8_t)m->green_to_blue_, green);
+    new_blue -= ColorTransformDelta_LOSSLESS_ENC((int8_t)m->red_to_blue_, red);
     new_blue &= 0xff;
     data[i] = (argb & 0xff00ff00u) | (new_red << 16) | (new_blue);
   }
@@ -560,7 +560,7 @@ static WEBP_INLINE uint8_t TransformColorRed(uint8_t green_to_red,
                                              uint32_t argb) {
   const int8_t green = U32ToS8(argb >> 8);
   int new_red = argb >> 16;
-  new_red -= ColorTransformDelta((int8_t)green_to_red, green);
+  new_red -= ColorTransformDelta_LOSSLESS_ENC((int8_t)green_to_red, green);
   return (new_red & 0xff);
 }
 
@@ -570,8 +570,8 @@ static WEBP_INLINE uint8_t TransformColorBlue(uint8_t green_to_blue,
   const int8_t green = U32ToS8(argb >>  8);
   const int8_t red   = U32ToS8(argb >> 16);
   int new_blue = argb & 0xff;
-  new_blue -= ColorTransformDelta((int8_t)green_to_blue, green);
-  new_blue -= ColorTransformDelta((int8_t)red_to_blue, red);
+  new_blue -= ColorTransformDelta_LOSSLESS_ENC((int8_t)green_to_blue, green);
+  new_blue -= ColorTransformDelta_LOSSLESS_ENC((int8_t)red_to_blue, red);
   return (new_blue & 0xff);
 }
 

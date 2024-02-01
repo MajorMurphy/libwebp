@@ -13,14 +13,14 @@
 
 #include <stdlib.h>
 
-#include "src/dec/vp8_dec.h"
-#include "src/dec/vp8i_dec.h"
-#include "src/dec/vp8li_dec.h"
-#include "src/dec/webpi_dec.h"
-#include "src/utils/utils.h"
-#include "src/webp/mux_types.h"  // ALPHA_FLAG
-#include "src/webp/decode.h"
-#include "src/webp/types.h"
+#include "../dec/vp8_dec.h"
+#include "../dec/vp8i_dec.h"
+#include "../dec/vp8li_dec.h"
+#include "../dec/webpi_dec.h"
+#include "../utils/utils.h"
+#include "../webp/mux_types.h"  // ALPHA_FLAG
+#include "../webp/decode.h"
+#include "../webp/types.h"
 
 //------------------------------------------------------------------------------
 // RIFF layout is:

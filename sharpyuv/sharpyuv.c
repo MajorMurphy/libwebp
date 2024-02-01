@@ -11,7 +11,7 @@
 //
 // Author: Skal (pascal.massimino@gmail.com)
 
-#include "sharpyuv/sharpyuv.h"
+#include "../sharpyuv/sharpyuv.h"
 
 #include <assert.h>
 #include <limits.h>
@@ -19,10 +19,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "src/webp/types.h"
-#include "sharpyuv/sharpyuv_cpu.h"
-#include "sharpyuv/sharpyuv_dsp.h"
-#include "sharpyuv/sharpyuv_gamma.h"
+#include "../webp/types.h"
+#include "../sharpyuv/sharpyuv_cpu.h"
+#include "../sharpyuv/sharpyuv_dsp.h"
+#include "../sharpyuv/sharpyuv_gamma.h"
 
 //------------------------------------------------------------------------------
 
@@ -54,11 +54,11 @@ typedef uint16_t fixed_y_t;   // unsigned type with extra precision for W
 
 //------------------------------------------------------------------------------
 
-static uint8_t clip_8b(fixed_t v) {
+static uint8_t clip_8b_SHARPYUV(fixed_t v) {
   return (!(v & ~0xff)) ? (uint8_t)v : (v < 0) ? 0u : 255u;
 }
 
-static uint16_t clip(fixed_t v, int max) {
+static uint16_t clip_SHARPYUV(fixed_t v, int max) {
   return (v < 0) ? 0 : (v > max) ? max : (uint16_t)v;
 }
 
@@ -252,9 +252,9 @@ static int ConvertWRGBToYUV(const fixed_y_t* best_y, const fixed_t* best_uv,
       const int b = best_uv[off + 2 * uv_w] + W;
       const int y = RGBToYUVComponent(r, g, b, yuv_matrix->rgb_to_y, sfix);
       if (yuv_bit_depth <= 8) {
-        y_ptr[i] = clip_8b(y);
+        y_ptr[i] = clip_8b_SHARPYUV(y);
       } else {
-        ((uint16_t*)y_ptr)[i] = clip(y, yuv_max);
+        ((uint16_t*)y_ptr)[i] = clip_SHARPYUV(y, yuv_max);
       }
     } while (++i < width);
     best_y += w;
@@ -275,11 +275,11 @@ static int ConvertWRGBToYUV(const fixed_y_t* best_y, const fixed_t* best_uv,
       const int u = RGBToYUVComponent(r, g, b, yuv_matrix->rgb_to_u, sfix);
       const int v = RGBToYUVComponent(r, g, b, yuv_matrix->rgb_to_v, sfix);
       if (yuv_bit_depth <= 8) {
-        u_ptr[i] = clip_8b(u);
-        v_ptr[i] = clip_8b(v);
+        u_ptr[i] = clip_8b_SHARPYUV(u);
+        v_ptr[i] = clip_8b_SHARPYUV(v);
       } else {
-        ((uint16_t*)u_ptr)[i] = clip(u, yuv_max);
-        ((uint16_t*)v_ptr)[i] = clip(v, yuv_max);
+        ((uint16_t*)u_ptr)[i] = clip_SHARPYUV(u, yuv_max);
+        ((uint16_t*)v_ptr)[i] = clip_SHARPYUV(v, yuv_max);
       }
     } while (++i < uv_w);
     best_uv += 3 * uv_w;
@@ -565,9 +565,9 @@ int SharpYuvConvertWithOptions(const void* r_ptr, const void* g_ptr,
   scaled_matrix.rgb_to_u[3] = Shift(yuv_matrix->rgb_to_u[3], sfix);
   scaled_matrix.rgb_to_v[3] = Shift(yuv_matrix->rgb_to_v[3], sfix);
 
-  return DoSharpArgbToYuv(r_ptr, g_ptr, b_ptr, rgb_step, rgb_stride,
-                          rgb_bit_depth, y_ptr, y_stride, u_ptr, u_stride,
-                          v_ptr, v_stride, yuv_bit_depth, width, height,
+  return DoSharpArgbToYuv((const uint8_t*)r_ptr, (const uint8_t*)g_ptr, (const uint8_t*)b_ptr, rgb_step, rgb_stride,
+                          rgb_bit_depth, (uint8_t*)y_ptr, y_stride, (uint8_t*)u_ptr, u_stride,
+                          (uint8_t*)v_ptr, v_stride, yuv_bit_depth, width, height,
                           &scaled_matrix, transfer_type);
 }
 

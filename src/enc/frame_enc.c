@@ -14,10 +14,10 @@
 #include <string.h>
 #include <math.h>
 
-#include "src/enc/cost_enc.h"
-#include "src/enc/vp8i_enc.h"
-#include "src/dsp/dsp.h"
-#include "src/webp/format_constants.h"  // RIFF constants
+#include "../enc/cost_enc.h"
+#include "../enc/vp8i_enc.h"
+#include "../dsp/dsp.h"
+#include "../webp/format_constants.h"  // RIFF constants
 
 #define SEGMENT_VISU 0
 #define DEBUG_SEARCH 0    // useful to track search convergence
@@ -551,7 +551,7 @@ static void ResetSideInfo(const VP8EncIterator* const it) {
 }
 #endif  // !defined(WEBP_DISABLE_STATS)
 
-static double GetPSNR(uint64_t mse, uint64_t size) {
+static double GetPSNR_FRAME_ENC(uint64_t mse, uint64_t size) {
   return (mse > 0 && size > 0) ? 10. * log10(255. * 255. * size / mse) : 99;
 }
 
@@ -606,7 +606,7 @@ static uint64_t OneStatPass(VP8Encoder* const enc, VP8RDLevel rd_opt,
     size = ((size + size_p0 + 1024) >> 11) + HEADER_SIZE_ESTIMATE;
     s->value = (double)size;
   } else {
-    s->value = GetPSNR(distortion, pixel_count);
+    s->value = GetPSNR_FRAME_ENC(distortion, pixel_count);
   }
   return size_p0;
 }
@@ -857,7 +857,7 @@ int VP8EncTokenLoop(VP8Encoder* const enc) {
       size += HEADER_SIZE_ESTIMATE;
       stats.value = (double)size;
     } else {  // compute and store PSNR
-      stats.value = GetPSNR(distortion, pixel_count);
+      stats.value = GetPSNR_FRAME_ENC(distortion, pixel_count);
     }
 
 #if (DEBUG_SEARCH > 0)

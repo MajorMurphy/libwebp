@@ -11,18 +11,18 @@
 //
 // Author: Skal (pascal.massimino@gmail.com)
 
-#include "sharpyuv/sharpyuv_dsp.h"
+#include "sharpyuv_dsp.h"
 
 #include <assert.h>
 #include <stdlib.h>
 
-#include "sharpyuv/sharpyuv_cpu.h"
-#include "src/webp/types.h"
+#include "sharpyuv_cpu.h"
+#include "../webp/types.h"
 
 //-----------------------------------------------------------------------------
 
 #if !WEBP_NEON_OMIT_C_CODE
-static uint16_t clip(int v, int max) {
+static uint16_t clip_SHARPYUV_DSP(int v, int max) {
   return (v < 0) ? 0 : (v > max) ? max : (uint16_t)v;
 }
 
@@ -34,7 +34,7 @@ static uint64_t SharpYuvUpdateY_C(const uint16_t* ref, const uint16_t* src,
   for (i = 0; i < len; ++i) {
     const int diff_y = ref[i] - src[i];
     const int new_y = (int)dst[i] + diff_y;
-    dst[i] = clip(new_y, max_y);
+    dst[i] = clip_SHARPYUV_DSP(new_y, max_y);
     diff += (uint64_t)abs(diff_y);
   }
   return diff;
@@ -57,8 +57,8 @@ static void SharpYuvFilterRow_C(const int16_t* A, const int16_t* B, int len,
   for (i = 0; i < len; ++i, ++A, ++B) {
     const int v0 = (A[0] * 9 + A[1] * 3 + B[0] * 3 + B[1] + 8) >> 4;
     const int v1 = (A[1] * 9 + A[0] * 3 + B[1] * 3 + B[0] + 8) >> 4;
-    out[2 * i + 0] = clip(best_y[2 * i + 0] + v0, max_y);
-    out[2 * i + 1] = clip(best_y[2 * i + 1] + v1, max_y);
+    out[2 * i + 0] = clip_SHARPYUV_DSP(best_y[2 * i + 0] + v0, max_y);
+    out[2 * i + 1] = clip_SHARPYUV_DSP(best_y[2 * i + 1] + v1, max_y);
   }
 }
 #endif  // !WEBP_NEON_OMIT_C_CODE

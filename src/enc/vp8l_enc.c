@@ -15,18 +15,18 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include "src/dsp/lossless.h"
-#include "src/dsp/lossless_common.h"
-#include "src/enc/backward_references_enc.h"
-#include "src/enc/histogram_enc.h"
-#include "src/enc/vp8i_enc.h"
-#include "src/enc/vp8li_enc.h"
-#include "src/utils/bit_writer_utils.h"
-#include "src/utils/huffman_encode_utils.h"
-#include "src/utils/palette.h"
-#include "src/utils/utils.h"
-#include "src/webp/encode.h"
-#include "src/webp/format_constants.h"
+#include "../dsp/lossless.h"
+#include "../dsp/lossless_common.h"
+#include "../enc/backward_references_enc.h"
+#include "../enc/histogram_enc.h"
+#include "../enc/vp8i_enc.h"
+#include "../enc/vp8li_enc.h"
+#include "../utils/bit_writer_utils.h"
+#include "../utils/huffman_encode_utils.h"
+#include "../utils/palette.h"
+#include "../utils/utils.h"
+#include "../webp/encode.h"
+#include "../webp/format_constants.h"
 
 // Maximum number of histogram images (sub-blocks).
 #define MAX_HUFF_IMAGE_SIZE       2600
@@ -1420,7 +1420,7 @@ static WebPEncodingError EncodePalette(VP8LBitWriter* const bw, int low_effort,
     tmp_palette[i] = VP8LSubPixels(palette[i], palette[i - 1]);
   }
   tmp_palette[0] = palette[0];
-  return EncodeImageNoHuffman(bw, tmp_palette, &enc->hash_chain_,
+  return (WebPEncodingError)EncodeImageNoHuffman(bw, tmp_palette, &enc->hash_chain_,
                               &enc->refs_[0], palette_size, 1, /*quality=*/20,
                               low_effort, enc->pic_, percent_range, percent);
 }

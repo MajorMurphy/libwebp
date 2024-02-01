@@ -11,14 +11,14 @@
 //
 // Author: Skal (pascal.massimino@gmail.com)
 
-#include "src/dsp/dsp.h"
+#include "../dsp/dsp.h"
 
 #if defined(WEBP_USE_SSE41)
 #include <smmintrin.h>
 #include <stdlib.h>  // for abs()
 
-#include "src/dsp/common_sse2.h"
-#include "src/enc/vp8i_enc.h"
+#include "../dsp/common_sse2.h"
+#include "../enc/vp8i_enc.h"
 
 //------------------------------------------------------------------------------
 // Compute susceptibility based on DCT-coeff histograms.
@@ -41,9 +41,9 @@ static void CollectHistogram_SSE41(const uint8_t* ref, const uint8_t* pred,
       const __m128i out0 = _mm_loadu_si128((__m128i*)&out[0]);
       const __m128i out1 = _mm_loadu_si128((__m128i*)&out[8]);
       // v = abs(out) >> 3
-      const __m128i abs0 = _mm_abs_epi16(out0);
+      const __m128i abs0_ENC_SSE41 = _mm_abs_epi16(out0);
       const __m128i abs1 = _mm_abs_epi16(out1);
-      const __m128i v0 = _mm_srai_epi16(abs0, 3);
+      const __m128i v0 = _mm_srai_epi16(abs0_ENC_SSE41, 3);
       const __m128i v1 = _mm_srai_epi16(abs1, 3);
       // bin = min(v, MAX_COEFF_THRESH)
       const __m128i bin0 = _mm_min_epi16(v0, max_coeff_thresh);

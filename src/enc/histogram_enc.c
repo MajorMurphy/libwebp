@@ -10,18 +10,18 @@
 // Author: Jyrki Alakuijala (jyrki@google.com)
 //
 #ifdef HAVE_CONFIG_H
-#include "src/webp/config.h"
+#include "../webp/config.h"
 #endif
 
 #include <float.h>
 #include <math.h>
 
-#include "src/dsp/lossless.h"
-#include "src/dsp/lossless_common.h"
-#include "src/enc/backward_references_enc.h"
-#include "src/enc/histogram_enc.h"
-#include "src/enc/vp8i_enc.h"
-#include "src/utils/utils.h"
+#include "../dsp/lossless.h"
+#include "../dsp/lossless_common.h"
+#include "../enc/backward_references_enc.h"
+#include "../enc/histogram_enc.h"
+#include "../enc/vp8i_enc.h"
+#include "../utils/utils.h"
 
 #define MAX_BIT_COST FLT_MAX
 
@@ -1181,7 +1181,7 @@ int VP8LGetHistoImageSymbols(int xsize, int ysize,
   const int entropy_combine_num_bins = low_effort ? NUM_PARTITIONS : BIN_SIZE;
   int entropy_combine;
   uint16_t* const map_tmp =
-      WebPSafeMalloc(2 * image_histo_raw_size, sizeof(*map_tmp));
+      (uint16_t*)WebPSafeMalloc(2 * image_histo_raw_size, sizeof(*map_tmp));
   uint16_t* const cluster_mappings = map_tmp + image_histo_raw_size;
   int num_used = image_histo_raw_size;
   if (orig_histo == NULL || map_tmp == NULL) {

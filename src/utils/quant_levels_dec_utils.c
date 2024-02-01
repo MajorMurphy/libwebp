@@ -14,11 +14,11 @@
 //
 // Author: Skal (pascal.massimino@gmail.com)
 
-#include "src/utils/quant_levels_dec_utils.h"
+#include "../utils/quant_levels_dec_utils.h"
 
 #include <string.h>   // for memset
 
-#include "src/utils/utils.h"
+#include "../utils/utils.h"
 
 // #define USE_DITHERING   // uncomment to enable ordered dithering (not vital)
 
@@ -70,12 +70,12 @@ typedef struct {
 } SmoothParams;
 
 //------------------------------------------------------------------------------
-
 #define CLIP_8b_MASK (int)(~0U << (8 + DFIX))
-static WEBP_INLINE uint8_t clip_8b(int v) {
+static WEBP_INLINE uint8_t clip_8b_QUANT_DEC(int v) {
   return (!(v & CLIP_8b_MASK)) ? (uint8_t)(v >> DFIX) : (v < 0) ? 0u : 255u;
 }
 #undef CLIP_8b_MASK
+
 
 // vertical accumulation
 static void VFilter(SmoothParams* const p) {
@@ -145,9 +145,9 @@ static void ApplyFilter(SmoothParams* const p) {
     if (v < p->max_ && v > p->min_) {
       const int c = (v << DFIX) + correction[average[x] - (v << LFIX)];
 #if defined(USE_DITHERING)
-      dst[x] = clip_8b(c + dither[x % DSIZE]);
+      dst[x] = clip_8b_QUANT_DEC(c + dither[x % DSIZE]);
 #else
-      dst[x] = clip_8b(c);
+      dst[x] = clip_8b_QUANT_DEC(c);
 #endif
     }
   }
